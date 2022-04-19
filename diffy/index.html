@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>diffy</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="text/javascript" src="./js/xlsx.core.min.js" defer></script>
+  <script type="text/javascript" src="./js/vue.global.prod.js" defer></script>
+  <!-- <script type="text/javascript" src="./js/excel-date-to-js.js" defer></script> -->
+  <!-- <script type="text/javascript" src="./js/lodash.min.js" defer></script> -->
+  <script type="text/javascript" src="./js/app.js" defer></script>
+</head>
+<body>
+
+  <div id="app">
+    <main v-if="files.A.selectedCell && files.B.selectedCell">
+      <Diff :file_a="files.A" :file_b="files.B"></Diff>
+    </main>
+    <main v-else>
+      <Excel label="A"></Excel>
+      <Excel label="B"></Excel>
+    </main>
+
+    <footer>
+      <small>v{{version}}</small>
+    </footer>
+  </div>
+  
+</body>
+</html>
