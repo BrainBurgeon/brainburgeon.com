@@ -15,6 +15,7 @@ Vue.createApp({
     Excel: {
       data: () => ({
         isHighlighted: false,
+        selectedSheetName: null,
         selectedSheetJson: null,
         selectedSheetJsonHead: null,
       }),
@@ -26,8 +27,7 @@ Vue.createApp({
       },
       methods: {
         reset() {
-          this.selectedSheetJson = null
-          this.selectedSheetJsonHead = null
+          this.deselectSheet()
           this.deselectCell()
         },
 
@@ -89,8 +89,16 @@ Vue.createApp({
           const selectedSheet = this.$root.files[this.label].parsed.Sheets[sheetName]
           const JSON = XLSX.utils.sheet_to_json(selectedSheet, { header: 1, defval: '' })
           this.$root.files[this.label].selectedSheet = selectedSheet
+          this.selectedSheetName = sheetName
           this.selectedSheetJsonHead = JSON.shift()
           this.selectedSheetJson = JSON
+        },
+
+        deselectSheet() {
+          this.$root.files[this.label].selectedSheet = null
+          this.selectedSheetName = null
+          this.selectedSheetJson = null
+          this.selectedSheetJsonHead = null
         },
 
         selectCell(r, c) {
@@ -104,9 +112,6 @@ Vue.createApp({
         encodeCell(cell) {
           return XLSX.utils.encode_cell(cell)
         },
-      },
-      mounted() {
-        
       },
       template: `
         <div
@@ -122,9 +127,11 @@ Vue.createApp({
             <div v-if="selectedSheetJson">
               <div v-if="$root.files[label].selectedCell">
                 <button type="button" @click="deselectCell">back</button>
-                <pre>Selected cell: {{encodeCell($root.files[label].selectedCell)}}</pre>
+                <p>Selected cell: {{encodeCell($root.files[label].selectedCell)}}</p>
               </div>
               <div v-else>
+                <button type="button" @click="deselectSheet">back</button>
+                <p>Selected sheet: {{selectedSheetName}}</p>
                 <p>Select a cell to compare:</p>
                 <table>
                   <thead>
