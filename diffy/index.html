@@ -8,9 +8,6 @@
   <link rel="stylesheet" href="styles.css" />
   <script type="text/javascript" src="./js/xlsx.core.min.js" defer></script>
   <script type="text/javascript" src="./js/vue.global.prod.js" defer></script>
-  <!-- <script type="text/javascript" src="./js/excel-date-to-js.js" defer></script> -->
-  <!-- <script type="text/javascript" src="./js/lodash.min.js" defer></script> -->
-  <script type="text/javascript" src="./js/app.js" defer></script>
 </head>
 <body>
 
@@ -27,6 +24,12 @@
       <small>v{{version}}</small>
     </footer>
   </div>
+
+  <script>
+    var script = document.createElement('script');
+    script.src = './js/app.js?c=' + new Date().getTime()
+    document.head.appendChild(script);
+  </script>
   
 </body>
 </html>
