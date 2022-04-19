@@ -28,6 +28,7 @@ Vue.createApp({
         reset() {
           this.selectedSheetJson = null
           this.selectedSheetJsonHead = null
+          this.deselectCell()
         },
 
         handleDragover(e) {
@@ -92,12 +93,16 @@ Vue.createApp({
           this.selectedSheetJson = JSON
         },
 
-        selectCell(rowIdx, colIdx) {
-          this.$root.files[this.label].selectedCell = { rowIdx, colIdx }
+        selectCell(r, c) {
+          this.$root.files[this.label].selectedCell = { r, c }
         },
 
         deselectCell() {
           this.$root.files[this.label].selectedCell = null
+        },
+
+        encodeCell(cell) {
+          return XLSX.utils.encode_cell(cell)
         },
       },
       mounted() {
@@ -117,7 +122,7 @@ Vue.createApp({
             <div v-if="selectedSheetJson">
               <div v-if="$root.files[label].selectedCell">
                 <button type="button" @click="deselectCell">back</button>
-                <pre>{{$root.files[label].selectedCell}}</pre>
+                <pre>Selected cell: {{encodeCell($root.files[label].selectedCell)}}</pre>
               </div>
               <div v-else>
                 <p>Select a cell to compare:</p>
@@ -166,7 +171,7 @@ Vue.createApp({
       },
       methods: {
         getCol(file) {
-          const colName = XLSX.utils.encode_col(file.selectedCell.colIdx)
+          const colName = XLSX.utils.encode_col(file.selectedCell.c)
           const rangeDecoded = XLSX.utils.decode_range(file.selectedSheet['!ref'])
           const range = `${colName}1:${colName}${rangeDecoded.e.r}`
           return XLSX.utils.sheet_to_json(file.selectedSheet, { range, header: 1, defval: this.defval })
