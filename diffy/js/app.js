@@ -17,7 +17,6 @@ Vue.createApp({
         isHighlighted: false,
         selectedSheetName: null,
         selectedSheetJson: null,
-        selectedSheetJsonHead: null,
       }),
       props: {
         label: {
@@ -90,7 +89,6 @@ Vue.createApp({
           const JSON = XLSX.utils.sheet_to_json(selectedSheet, { header: 1, defval: '' })
           this.$root.files[this.label].selectedSheet = selectedSheet
           this.selectedSheetName = sheetName
-          this.selectedSheetJsonHead = JSON.shift()
           this.selectedSheetJson = JSON
         },
 
@@ -98,7 +96,6 @@ Vue.createApp({
           this.$root.files[this.label].selectedSheet = null
           this.selectedSheetName = null
           this.selectedSheetJson = null
-          this.selectedSheetJsonHead = null
         },
 
         selectCell(r, c) {
@@ -134,11 +131,6 @@ Vue.createApp({
                 <p>Selected sheet: {{selectedSheetName}}</p>
                 <p>Select a cell to compare:</p>
                 <table>
-                  <thead>
-                    <tr>
-                      <th v-for="(head, headIdx) in selectedSheetJsonHead" :key="'head'+headIdx">{{head}}</th>
-                    </tr>
-                  </thead>
                   <tbody>
                     <tr v-for="(row, rowIdx) in selectedSheetJson" :key="'row'+rowIdx">
                       <td v-for="(cell, colIdx) in row" :key="'col'+colIdx" @click="selectCell(rowIdx, colIdx)">{{cell}}</td>
@@ -164,7 +156,7 @@ Vue.createApp({
       data: () => ({
         diffA: null,
         diffB: null,
-        defval: '[empty]'
+        defval: '[empty]',
       }),
       props: {
         file_a: {
@@ -180,8 +172,9 @@ Vue.createApp({
         getCol(file) {
           const colName = XLSX.utils.encode_col(file.selectedCell.c)
           const rangeDecoded = XLSX.utils.decode_range(file.selectedSheet['!ref'])
-          const range = `${colName}1:${colName}${rangeDecoded.e.r}`
-          return XLSX.utils.sheet_to_json(file.selectedSheet, { range, header: 1, defval: this.defval })
+          const range = `${colName}${file.selectedCell.r + 1}:${colName}${rangeDecoded.e.r + 1}`
+          const col = XLSX.utils.sheet_to_json(file.selectedSheet, { range, header: 1, defval: this.defval })
+          return col
         },
 
         diffUnique(arrA, arrB) {
@@ -189,19 +182,25 @@ Vue.createApp({
           let diffA = []
 
           // items missign from A
-          let diffB = arrB
+          let diffB = arrB.filter(v => v !== this.defval)
 
           arrA.forEach(a => {
-            const idx = diffB.indexOf(a)
-            if (idx > -1) {
-              diffB.splice(idx, 1)
-            }
-            else {
-              diffA.push(a)
+            if (a !== this.defval) {
+              const idx = diffB.indexOf(a)
+              if (idx > -1) {
+                diffB.splice(idx, 1)
+              }
+              else {
+                diffA.push(a)
+              }
             }
           })
           
           return [diffA, diffB]
+        },
+
+        singPlu(amount, singular, plural) {
+          return amount === 1 ? singular : plural
         },
       },
       mounted() {
@@ -216,12 +215,12 @@ Vue.createApp({
       template: `
       <div v-if="diffA" class="result-area">
         <h3>{{file_a.meta.name}}</h3>
-        <p>{{diffA.length}} items missing from B:</p>
+        <p>{{diffA.length}} {{singPlu(diffA.length, 'item', 'items')}} missing from B:</p>
         <pre>{{diffA}}</pre>
       </div>
       <div v-if="diffB" class="result-area">
         <h3>{{file_b.meta.name}}</h3>
-        <p>{{diffB.length}} items missing from A:</p>
+        <p>{{diffB.length}} {{singPlu(diffB.length, 'item', 'items')}} missing from A:</p>
         <pre>{{diffB}}</pre>
       </div>
       `
