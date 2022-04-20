@@ -7,28 +7,33 @@
   <title>diffy</title>
   <link rel="stylesheet" href="styles.css" />
   <script type="text/javascript" src="./js/xlsx.core.min.js" defer></script>
-  <script type="text/javascript" src="./js/vue.global.prod.js" defer></script>
+  <!-- <script type="text/javascript" src="./js/vue.global.prod.js" defer></script> -->
+  <script type="text/javascript" src="https://brainburgeon.com/diffy/js/vue.global.prod.js" defer></script>
 </head>
 <body>
 
   <div id="app">
+    <div v-if="!loaded">Loading...</div>
+
     <main v-if="files.A.selectedCell && files.B.selectedCell">
       <Diff :file_a="files.A" :file_b="files.B"></Diff>
     </main>
-    <main v-else>
+    <main v-else v-cloak>
       <Excel label="A"></Excel>
       <Excel label="B"></Excel>
     </main>
 
-    <footer>
+    <footer v-cloak>
       <small>v{{version}}</small>
     </footer>
   </div>
 
   <script>
-    var script = document.createElement('script');
-    script.src = './js/app.js?c=' + new Date().getTime()
-    document.head.appendChild(script);
+    window.onload = function() {
+      var script = document.createElement('script')
+      script.src = './js/app.js?c=' + new Date().getTime()
+      document.head.appendChild(script)
+    }
   </script>
   
 </body>
