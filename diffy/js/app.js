@@ -5,7 +5,7 @@ const allowedFileTypes = [
 
 Vue.createApp({
   data: () => ({
-    version: '1.0.2',
+    version: '1.0.3',
     files: {
       A: {},
       B: {},
