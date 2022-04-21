@@ -203,6 +203,25 @@ Vue.createApp({
         singPlu(amount, singular, plural) {
           return amount === 1 ? singular : plural
         },
+
+        now() {
+          const d = new Date()
+          const n = ['getFullYear', 'getMonth', 'getDate', 'getHours', 'getMinutes', 'getSeconds']
+          return n.map(fn => {
+            let v = d[fn]()
+            if (fn === 'getMonth') v += 1
+            return String(v).padStart(2, '0')
+          }).join('')
+        },
+
+        getCSVfilename(filename) {
+          return filename + '__diffy__' + this.now() + '.csv'
+        },
+
+        getCSVdata(diff) {
+          const csv = diff.map(val => `"${val}"`).join('\n')
+          return 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv)
+        },
       },
       mounted() {
         const colA = this.getCol(this.file_a).map(val => val[0])
@@ -217,11 +236,13 @@ Vue.createApp({
       <div v-if="diffA" class="result-area">
         <h3>{{file_a.meta.name}}</h3>
         <p>{{diffA.length}} {{singPlu(diffA.length, 'item', 'items')}} missing from B:</p>
+        <div><a :href="getCSVdata(diffA)" :download="getCSVfilename(file_a.meta.name)">download CSV</a></div>
         <pre>{{diffA}}</pre>
       </div>
       <div v-if="diffB" class="result-area">
         <h3>{{file_b.meta.name}}</h3>
         <p>{{diffB.length}} {{singPlu(diffB.length, 'item', 'items')}} missing from A:</p>
+        <div><a :href="getCSVdata(diffB)" :download="getCSVfilename(file_b.meta.name)">download CSV</a></div>
         <pre>{{diffB}}</pre>
       </div>
       `
