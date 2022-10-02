@@ -4,10 +4,9 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>click2copy v0.3</title>
+    <title>click2copy v1.0</title>
     <style>
       html {
-        /* max-width: 70ch; */
         margin: auto;
         line-height: 1.75;
         font-size: 2.25em;
@@ -38,12 +37,15 @@
         display: flex;
         position: relative;
       }
+      li.active {
+        outline: 3px solid #86ea86;
+      }
       li::before {
         content: attr(data-value);
         position: absolute;
         top: 0;
         left: 0;
-        transform: translateY(-20px);
+        transform: translateY(-22px);
         font-size: 20px;
         line-height: 1;
         font-family: monospace;
@@ -55,19 +57,25 @@
         border: none;
         outline: none;
       }
-      input:not(.add):focus {
-        background: #86ea86;
-      }
     </style>
   </head>
   <body>
     <div id="app">
       <ul>
-        <li v-for="(item, index) in items" :key="item">
+        <li
+          v-for="(item, index) in items"
+          :key="item"
+          :class="{active: index === activeIndex}"
+        >
           <button @click="() => remove(index)" type="button" class="remove">
             x
           </button>
-          <input type="text" :value="item" ref="items" />
+          <input
+            type="text"
+            :value="item"
+            ref="items"
+            @focus="() => copy(index)"
+          />
           <button @click="() => copy(index)" type="button">copy</button>
         </li>
         <li><input type="text" @keyup.enter="addItem" class="add" /></li>
@@ -81,6 +89,7 @@
         data() {
           return {
             items: [],
+            activeIndex: -1,
           };
         },
         methods: {
@@ -91,6 +100,7 @@
             e.target.value = "";
           },
           copy(index) {
+            this.activeIndex = index;
             const input = this.$refs.items[index];
             const _val = input.value;
             if (_val.includes("$")) {
@@ -98,6 +108,7 @@
                 "$",
                 Math.random().toString(36).slice(2, 10)
               );
+              console.log(input.value);
               input.parentElement.setAttribute("data-value", input.value);
             }
             input.select();
