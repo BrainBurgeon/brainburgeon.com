@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>click2copy v0.2</title>
+    <title>click2copy v0.3</title>
     <style>
       html {
         /* max-width: 70ch; */
@@ -81,8 +81,16 @@
           },
           copy(index) {
             const input = this.$refs.items[index];
+            const _val = input.value;
+            if (_val.includes("$")) {
+              input.value = _val.replace(
+                "$",
+                Math.random().toString(36).slice(2, 10)
+              );
+            }
             input.select();
             document.execCommand("copy");
+            input.value = _val;
           },
           remove(index) {
             this.items.splice(index, 1);
