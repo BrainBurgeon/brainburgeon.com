@@ -36,6 +36,17 @@
       li {
         margin: 1em 0;
         display: flex;
+        position: relative;
+      }
+      li::before {
+        content: attr(data-value);
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translateY(-20px);
+        font-size: 20px;
+        line-height: 1;
+        font-family: monospace;
       }
       input {
         width: 100%;
@@ -45,14 +56,14 @@
         outline: none;
       }
       input:not(.add):focus {
-        background: green;
+        background: #86ea86;
       }
     </style>
   </head>
   <body>
     <div id="app">
       <ul>
-        <li v-for="(item, index) in items">
+        <li v-for="(item, index) in items" :key="item">
           <button @click="() => remove(index)" type="button" class="remove">
             x
           </button>
@@ -87,6 +98,7 @@
                 "$",
                 Math.random().toString(36).slice(2, 10)
               );
+              input.parentElement.setAttribute("data-value", input.value);
             }
             input.select();
             document.execCommand("copy");
