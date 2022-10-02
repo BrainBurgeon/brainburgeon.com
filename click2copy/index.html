@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>click2copy</title>
+    <style>
+      html {
+        /* max-width: 70ch; */
+        margin: auto;
+        line-height: 1.75;
+        font-size: 2.25em;
+      }
+      #app {
+        display: flex;
+        justify-content: center;
+      }
+      input,
+      button {
+        font-size: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button.remove {
+        border: none;
+        background: none;
+        color: red;
+      }
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      li {
+        margin: 1em 0;
+        display: flex;
+      }
+      input {
+        /* max-width: 60vw; */
+      }
+      input:not(.add) {
+        border: none;
+        outline: none;
+      }
+      input:not(.add):focus {
+        background: green;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <ul>
+        <li v-for="(item, index) in items">
+          <button @click="() => remove(index)" type="button" class="remove">
+            x
+          </button>
+          <input type="text" :value="item" ref="items" />
+          <button @click="() => copy(index)" type="button">copy</button>
+        </li>
+        <li><input type="text" @keyup.enter="addItem" class="add" /></li>
+      </ul>
+    </div>
+
+    <script type="module">
+      import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+
+      createApp({
+        data() {
+          return {
+            items: [],
+          };
+        },
+        methods: {
+          addItem(e) {
+            const val = e.target.value;
+            if (!val.length) return;
+            this.items.push(val);
+            e.target.value = "";
+          },
+          copy(index) {
+            const input = this.$refs.items[index];
+            input.select();
+            document.execCommand("copy");
+          },
+          remove(index) {
+            this.items.splice(index, 1);
+          },
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>
